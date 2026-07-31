@@ -334,13 +334,12 @@
     }
 
     function entered(v) {
-      function entered(v) {
   const value = v.trim();
 
   return value === "-" ||
          (value !== "" && Number.isFinite(Number(value)));
-      }
     }
+
     function scoreValue(v) {
   return v.trim() === "-" ? 0 : Number(v);
 }
