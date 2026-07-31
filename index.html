@@ -414,8 +414,8 @@
 
       $("leader").textContent =
         t1 === t2 ? "Match tied" :
-        t1 > t2 ? `${p1} leads by ${t1-t2}` :
-                  `${p2} leads by ${t2-t1}`;
+        t1 > t2 ? `${p2} has advantage by ${t1-t2}` :
+                  `${p1} has advantage by ${t2-t1}`;
 
       [...scoreRows.rows].forEach((row, i) => {
         row.querySelector(".dealer").textContent = dealerFor(i);
