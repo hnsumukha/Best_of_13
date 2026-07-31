@@ -334,8 +334,16 @@
     }
 
     function entered(v) {
-      return v !== "" && Number.isFinite(Number(v));
+      function entered(v) {
+  const value = v.trim();
+
+  return value === "-" ||
+         (value !== "" && Number.isFinite(Number(value)));
+      }
     }
+    function scoreValue(v) {
+  return v.trim() === "-" ? 0 : Number(v);
+}
 
     function complete(game) {
       return entered(game.p1) && entered(game.p2);
@@ -353,7 +361,7 @@
 
     function totalFor(key) {
       return state.scores.reduce((sum, game) =>
-        complete(game) ? sum + Number(game[key]) : sum, 0);
+        complete(game) ? sum + scoreValue(game[key]) : sum, 0);
     }
 
     function buildRows() {
@@ -364,7 +372,7 @@
           <td>${i+1}</td>
           <td class="meta">${JOKERS[i]}</td>
           <td class="meta dealer"></td>
-          <td><input class="score-input" type="number" inputmode="numeric" step="1"
+          <td><input class="score-input" type="text" inputmode="text"
              data-index="${i}" data-player="p1" aria-label="Player 1 score, game ${i+1}"></td>
           <td><input class="score-input" type="number" inputmode="numeric" step="1"
              data-index="${i}" data-player="p2" aria-label="Player 2 score, game ${i+1}"></td>`;
