@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#111827" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="apple-mobile-web-app-title" content="Scorekeeper" />
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+  <title>13-Game Scorekeeper</title>
+  <style>
+    :root {
+      --bg: #f3f4f6;
+      --card: #ffffff;
+      --text: #111827;
+      --muted: #6b7280;
+      --border: #d1d5db;
+      --accent: #2563eb;
+      --accent-soft: #dbeafe;
+      --positive: #15803d;
+      --danger: #b91c1c;
+      --shadow: 0 8px 28px rgba(0,0,0,.10);
+    }
+
+    body.dark {
+      --bg: #0b1220;
+      --card: #111827;
+      --text: #f9fafb;
+      --muted: #9ca3af;
+      --border: #374151;
+      --accent-soft: #172554;
+      --shadow: 0 8px 28px rgba(0,0,0,.35);
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      padding:
+        max(14px, env(safe-area-inset-top))
+        14px
+        max(24px, env(safe-area-inset-bottom));
+    }
+
+    .app { max-width: 1050px; margin: auto; }
+
+    .topbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 14px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(27px, 5vw, 44px);
+      letter-spacing: -.04em;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      box-shadow: var(--shadow);
+      padding: 16px;
+      margin-bottom: 14px;
+    }
+
+    .names, .dashboard, .current {
+      display: grid;
+      gap: 12px;
+    }
+
+    .names { grid-template-columns: 1fr 1fr; }
+    .dashboard { grid-template-columns: 1fr 1fr 1fr; }
+    .current { grid-template-columns: 1fr 1fr; }
+
+    label, .eyebrow {
+      display: block;
+      font-size: 12px;
+      font-weight: 850;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: .07em;
+      margin-bottom: 6px;
+    }
+
+    input[type="text"], input[type="number"] {
+      width: 100%;
+      border: 1px solid var(--border);
+      border-radius: 13px;
+      padding: 12px;
+      font-size: 19px;
+      background: var(--card);
+      color: var(--text);
+    }
+
+    input:focus {
+      outline: 3px solid var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .stat {
+      border: 1px solid var(--border);
+      border-radius: 17px;
+      padding: 14px;
+      background: color-mix(in srgb, var(--card) 92%, var(--bg));
+      min-height: 106px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+    }
+
+    .stat .value {
+      font-size: clamp(27px, 5.3vw, 42px);
+      font-weight: 950;
+      line-height: 1.03;
+      overflow-wrap: anywhere;
+    }
+
+    .current .stat {
+      min-height: 145px;
+      background: var(--accent-soft);
+      border-color: var(--accent);
+    }
+
+    .current .value {
+      color: var(--accent);
+      font-size: clamp(38px, 8vw, 66px);
+    }
+
+    .leader {
+      margin-top: 12px;
+      text-align: center;
+      font-size: clamp(20px, 4vw, 30px);
+      font-weight: 900;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+      border: 1px solid var(--border);
+      border-radius: 15px;
+    }
+
+    table {
+      width: 100%;
+      min-width: 720px;
+      border-collapse: collapse;
+    }
+
+    th, td {
+      padding: 10px 8px;
+      border-bottom: 1px solid var(--border);
+      text-align: center;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 12px;
+      text-transform: uppercase;
+      letter-spacing: .05em;
+    }
+
+    tr:last-child td { border-bottom: 0; }
+    tr.current-row { background: var(--accent-soft); }
+    tr.complete td:first-child::after { content: " ✓"; color: var(--positive); }
+
+    td:first-child { font-weight: 950; }
+    .meta { font-weight: 800; white-space: nowrap; }
+    .score-input { min-width: 115px; text-align: center; font-weight: 900; }
+
+    .buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    button {
+      border: 0;
+      border-radius: 13px;
+      padding: 12px 16px;
+      font-size: 16px;
+      font-weight: 850;
+      cursor: pointer;
+      background: #e5e7eb;
+      color: #111827;
+    }
+
+    button.primary { background: var(--accent); color: white; }
+    button.danger { background: #fee2e2; color: var(--danger); }
+
+    .note {
+      margin-top: 10px;
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--muted);
+    }
+
+    @media (max-width: 720px) {
+      .dashboard { grid-template-columns: 1fr 1fr; }
+      .dashboard .stat:last-child { grid-column: 1 / -1; }
+      .current, .names { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+  <main class="app">
+    <div class="topbar">
+      <h1>13-Game Scorekeeper</h1>
+      <button id="themeToggle">Dark mode</button>
+    </div>
+
+    <section class="card">
+      <div class="names">
+        <div>
+          <label for="player1">Player 1 — card-draw winner</label>
+          <input id="player1" type="text" autocomplete="off" />
+        </div>
+        <div>
+          <label for="player2">Player 2 — card-draw loser</label>
+          <input id="player2" type="text" autocomplete="off" />
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <div class="dashboard">
+        <div class="stat">
+          <div class="eyebrow" id="p1TotalLabel">Player 1 total</div>
+          <div class="value" id="p1Total">0</div>
+        </div>
+        <div class="stat">
+          <div class="eyebrow" id="p2TotalLabel">Player 2 total</div>
+          <div class="value" id="p2Total">0</div>
+        </div>
+        <div class="stat">
+          <div class="eyebrow">Games finished</div>
+          <div class="value" id="gamesFinished">0 / 13</div>
+        </div>
+      </div>
+
+      <div class="current">
+        <div class="stat">
+          <div class="eyebrow">Current dealer</div>
+          <div class="value" id="currentDealer">Player 2</div>
+        </div>
+        <div class="stat">
+          <div class="eyebrow">Current joker</div>
+          <div class="value" id="currentJoker">Ace</div>
+        </div>
+      </div>
+
+      <div class="leader" id="leader">Match tied</div>
+    </section>
+
+    <section class="card">
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th>Game</th>
+              <th>Joker</th>
+              <th>Dealer</th>
+              <th id="p1Header">Player 1 score</th>
+              <th id="p2Header">Player 2 score</th>
+            </tr>
+          </thead>
+          <tbody id="scoreRows"></tbody>
+        </table>
+      </div>
+
+      <div class="buttons">
+        <button id="undoLast" class="primary">Undo last completed game</button>
+        <button id="clearScores">Clear scores</button>
+        <button id="resetAll" class="danger">Reset everything</button>
+      </div>
+
+      <div class="note">
+        A game is complete only when both scores in that row are entered.
+        The next dealer and joker update automatically. Scores and names are saved on this device.
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const GAME_COUNT = 13;
+    const JOKERS = ["Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King"];
+    const STORAGE_KEY = "cardScorekeeperPWA_v2";
+
+    const $ = id => document.getElementById(id);
+    const scoreRows = $("scoreRows");
+
+    const defaultState = () => ({
+      player1: "Player 1",
+      player2: "Player 2",
+      dark: false,
+      scores: Array.from({length: GAME_COUNT}, () => ({p1:"", p2:""}))
+    });
+
+    function loadState() {
+      try {
+        const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
+        if (!parsed) return defaultState();
+        const state = defaultState();
+        state.player1 = parsed.player1 || state.player1;
+        state.player2 = parsed.player2 || state.player2;
+        state.dark = !!parsed.dark;
+        for (let i=0; i<GAME_COUNT; i++) {
+          state.scores[i] = {
+            p1: parsed.scores?.[i]?.p1 ?? "",
+            p2: parsed.scores?.[i]?.p2 ?? ""
+          };
+        }
+        return state;
+      } catch {
+        return defaultState();
+      }
+    }
+
+    let state = loadState();
+
+    function save() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    }
+
+    function name(value, fallback) {
+      return value.trim() || fallback;
+    }
+
+    function entered(v) {
+      return v !== "" && Number.isFinite(Number(v));
+    }
+
+    function complete(game) {
+      return entered(game.p1) && entered(game.p2);
+    }
+
+    function firstIncomplete() {
+      return state.scores.findIndex(g => !complete(g));
+    }
+
+    function dealerFor(index) {
+      return index % 2 === 0
+        ? name(state.player2, "Player 2")
+        : name(state.player1, "Player 1");
+    }
+
+    function totalFor(key) {
+      return state.scores.reduce((sum, game) =>
+        complete(game) ? sum + Number(game[key]) : sum, 0);
+    }
+
+    function buildRows() {
+      scoreRows.innerHTML = "";
+      for (let i=0; i<GAME_COUNT; i++) {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td>${i+1}</td>
+          <td class="meta">${JOKERS[i]}</td>
+          <td class="meta dealer"></td>
+          <td><input class="score-input" type="number" inputmode="numeric" step="1"
+             data-index="${i}" data-player="p1" aria-label="Player 1 score, game ${i+1}"></td>
+          <td><input class="score-input" type="number" inputmode="numeric" step="1"
+             data-index="${i}" data-player="p2" aria-label="Player 2 score, game ${i+1}"></td>`;
+        scoreRows.appendChild(row);
+      }
+
+      document.querySelectorAll(".score-input").forEach(input => {
+        input.addEventListener("input", e => {
+          const i = Number(e.target.dataset.index);
+          state.scores[i][e.target.dataset.player] = e.target.value;
+          save();
+          render();
+        });
+      });
+    }
+
+    function render() {
+      document.body.classList.toggle("dark", state.dark);
+      $("themeToggle").textContent = state.dark ? "Light mode" : "Dark mode";
+
+      const p1 = name(state.player1, "Player 1");
+      const p2 = name(state.player2, "Player 2");
+      $("player1").value = state.player1;
+      $("player2").value = state.player2;
+
+      $("p1Header").textContent = `${p1} score`;
+      $("p2Header").textContent = `${p2} score`;
+      $("p1TotalLabel").textContent = `${p1} total`;
+      $("p2TotalLabel").textContent = `${p2} total`;
+
+      const t1 = totalFor("p1");
+      const t2 = totalFor("p2");
+      $("p1Total").textContent = t1;
+      $("p2Total").textContent = t2;
+
+      const finished = state.scores.filter(complete).length;
+      $("gamesFinished").textContent = `${finished} / ${GAME_COUNT}`;
+
+      const current = firstIncomplete();
+      if (current === -1) {
+        $("currentDealer").textContent = "Match complete";
+        $("currentJoker").textContent = "All 13 played";
+      } else {
+        $("currentDealer").textContent = dealerFor(current);
+        $("currentJoker").textContent = JOKERS[current];
+      }
+
+      $("leader").textContent =
+        t1 === t2 ? "Match tied" :
+        t1 > t2 ? `${p1} leads by ${t1-t2}` :
+                  `${p2} leads by ${t2-t1}`;
+
+      [...scoreRows.rows].forEach((row, i) => {
+        row.querySelector(".dealer").textContent = dealerFor(i);
+        const p1Input = row.querySelector('[data-player="p1"]');
+        const p2Input = row.querySelector('[data-player="p2"]');
+        if (document.activeElement !== p1Input) p1Input.value = state.scores[i].p1;
+        if (document.activeElement !== p2Input) p2Input.value = state.scores[i].p2;
+        row.classList.toggle("complete", complete(state.scores[i]));
+        row.classList.toggle("current-row", i === current);
+      });
+    }
+
+    $("player1").addEventListener("input", e => {
+      state.player1 = e.target.value; save(); render();
+    });
+
+    $("player2").addEventListener("input", e => {
+      state.player2 = e.target.value; save(); render();
+    });
+
+    $("themeToggle").addEventListener("click", () => {
+      state.dark = !state.dark; save(); render();
+    });
+
+    $("undoLast").addEventListener("click", () => {
+      let last = -1;
+      for (let i=0; i<GAME_COUNT; i++) {
+        if (complete(state.scores[i])) last = i;
+      }
+      if (last === -1) return;
+      state.scores[last] = {p1:"", p2:""};
+      save(); render();
+    });
+
+    $("clearScores").addEventListener("click", () => {
+      if (!confirm("Clear all game scores? Player names will remain.")) return;
+      state.scores = Array.from({length: GAME_COUNT}, () => ({p1:"",p2:""}));
+      save(); render();
+    });
+
+    $("resetAll").addEventListener("click", () => {
+      if (!confirm("Reset names, theme and all scores?")) return;
+      state = defaultState(); save(); render();
+    });
+
+    buildRows();
+    render();
+
+    if ("serviceWorker" in navigator) {
+      window.addEventListener("load", () => {
+        navigator.serviceWorker.register("./sw.js");
+      });
+    }
+  </script>
+</body>
+</html>
