@@ -1,5 +1,5 @@
 {
-  "name": "13-Game Card Scorekeeper",
+  "name": "Best of 13",
   "short_name": "Scorekeeper",
   "description": "A two-player 13-game card scorekeeper with alternating dealer and joker tracking.",
   "start_url": "./",
