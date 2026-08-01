@@ -429,6 +429,14 @@
     </section>
   </main>
 
+navigator.serviceWorker.getRegistrations().then(registrations => {
+  registrations.forEach(registration => registration.unregister());
+});
+
+caches.keys().then(keys => {
+  keys.forEach(key => caches.delete(key));
+});
+  
   <script>
     const GAME_COUNT = 13;
     const JOKERS = ["Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King"];
