@@ -148,7 +148,13 @@
       font-size: 22px;
       font-weight: 900;
     }
-
+.panel {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: var(--card);
+  padding-bottom: 8px;
+}
     .table-wrap {
       overflow-x: auto;
       border: 1px solid var(--border);
@@ -175,8 +181,8 @@
       letter-spacing: .05em;
 
       position: sticky;
-      top: 0;
-      z-index: 2;
+      top: 150px;
+      z-index: 9;
       background: var(--card);
     }
 
