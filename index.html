@@ -168,6 +168,11 @@
       font-weight: 900;
       text-transform: uppercase;
       letter-spacing: .05em;
+
+      position: sticky;
+      top: 0;
+      z-index: 2;
+      background: var(--card);
     }
 
     tr:last-child td { border-bottom: 0; }
@@ -312,11 +317,11 @@
         <table>
           <thead>
             <tr>
-              <th>Game</th>
-              <th>Joker</th>
-              <th>Dealer</th>
-              <th id="p1Header">Player 1 score</th>
-              <th id="p2Header">Player 2 score</th>
+                <th><strong>GAME</strong></th>
+                <th><strong>JOKER</strong></th>
+                <th><strong>DEALER</strong></th>
+                <th><strong>PLAYER 1 SCORE</strong></th>
+                <th><strong>PLAYER 2 SCORE</strong></th>
             </tr>
           </thead>
           <tbody id="scoreRows"></tbody>
