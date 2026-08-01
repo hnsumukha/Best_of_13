@@ -10,6 +10,9 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <link rel="apple-touch-icon" href="icon-192.png" />
   <title>Best of 13</title>
+ 
+  
+  
   <style>
     :root {
       --bg: #f3f4f6;
@@ -207,7 +210,50 @@
       .dashboard .stat:last-child { grid-column: 1 / -1; }
       .current, .names { grid-template-columns: 1fr; }
     }
+    .joker-cards {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 14px;
+  flex-wrap: wrap;
+}
+
+.playing-card {
+  width: 64px;
+  height: 90px;
+  background: white;
+  border: 2px solid #111827;
+  border-radius: 9px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 8px rgba(0,0,0,.2);
+  font-weight: 900;
+}
+
+.playing-card .rank {
+  font-size: 25px;
+  line-height: 1;
+}
+
+.playing-card .suit {
+  font-size: 30px;
+  line-height: 1;
+}
+
+.playing-card.red {
+  color: #dc2626;
+}
+
+.playing-card.black {
+  color: #111827;
+}
   </style>
+
+
+
+  
 </head>
 <body>
   <main class="app">
@@ -253,6 +299,7 @@
         <div class="stat">
           <div class="eyebrow">Current joker</div>
           <div class="value" id="currentJoker">Ace</div>
+          <div id="jokerCards" class="joker-cards"></div>
         </div>
       </div>
 
@@ -291,18 +338,34 @@
   <script>
     const GAME_COUNT = 13;
     const JOKERS = ["Ace","2","3","4","5","6","7","8","9","10","Jack","Queen","King"];
+    const CARD_RANKS = ["A","2","3","4","5","6","7","8","9","10","J","Q","K"];
     const STORAGE_KEY = "cardScorekeeperPWA_v2";
 
     const $ = id => document.getElementById(id);
     const scoreRows = $("scoreRows");
 
     const defaultState = () => ({
-      player1: "Player 1",
-      player2: "Player 2",
+      player1: "",
+      player2: "",
       dark: false,
       scores: Array.from({length: GAME_COUNT}, () => ({p1:"", p2:""}))
     });
 
+    function renderJokerCards(rank) {
+  const suits = [
+    { symbol: "♠", colour: "black" },
+    { symbol: "♥", colour: "red" },
+    { symbol: "♦", colour: "red" },
+    { symbol: "♣", colour: "black" }
+  ];
+
+  $("jokerCards").innerHTML = suits.map(suit => `
+    <div class="playing-card ${suit.colour}">
+      <div class="rank">${rank}</div>
+      <div class="suit">${suit.symbol}</div>
+    </div>
+  `).join("");
+}
     function loadState() {
       try {
         const parsed = JSON.parse(localStorage.getItem(STORAGE_KEY));
@@ -417,6 +480,7 @@
       } else {
         $("currentDealer").textContent = dealerFor(current);
         $("currentJoker").textContent = JOKERS[current];
+        renderJokerCards(CARD_RANKS[current]);
       }
 
       $("leader").textContent =
