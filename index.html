@@ -429,13 +429,7 @@
     </section>
   </main>
 
-navigator.serviceWorker.getRegistrations().then(registrations => {
-  registrations.forEach(registration => registration.unregister());
-});
 
-caches.keys().then(keys => {
-  keys.forEach(key => caches.delete(key));
-});
   
   <script>
     const GAME_COUNT = 13;
