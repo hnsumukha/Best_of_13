@@ -513,9 +513,7 @@
       state.player2 = e.target.value; save(); render();
     });
 
-    $("themeToggle").addEventListener("click", () => {
-      state.dark = !state.dark; save(); render();
-    });
+    
 
     $("undoLast").addEventListener("click", () => {
       let last = -1;
