@@ -1,4 +1,4 @@
-const CACHE = "card-scorekeeper-v1.0.42";
+const CACHE = "card-scorekeeper-v1.0.43";
 const ASSETS = [
   "./",
   "./index.html",
