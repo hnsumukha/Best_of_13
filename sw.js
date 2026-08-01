@@ -1,4 +1,4 @@
-const CACHE = "card-scorekeeper-v1.0.50";
+const CACHE = "card-scorekeeper-v1.0.51";
 
 const ASSETS = [
   "./manifest.webmanifest",
